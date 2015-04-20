@@ -1,0 +1,13 @@
+#ifndef LINTPLUG_GLOBAL_H
+#define LINTPLUG_GLOBAL_H
+
+#include <QtGlobal>
+
+#if defined(LINTPLUG_LIBRARY)
+#  define LINTPLUGSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define LINTPLUGSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // LINTPLUG_GLOBAL_H
+

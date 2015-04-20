@@ -1,0 +1,12 @@
+{
+    \"Name\" : \"LintPlug\",
+    \"Version\" : \"0.0.1\",
+    \"CompatVersion\" : \"0.0.1\",
+    \"Vendor\" : \"RS\",
+    \"Copyright\" : \"(C) Rohde-Schwarz GmbH\",
+    \"License\" : \"Freeware\",
+    \"Description\" : \"PC Lint plugin for QtCreator\",
+    \"Url\" : \"http://www.rohde-schwarz.com\",
+    $$dependencyList
+}
+
