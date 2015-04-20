@@ -1,0 +1,69 @@
+-i"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\include"
+-i"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\atlmfc\include"
+// Windows SDK
+-i"C:\Program Files\Microsoft SDKs\Windows\v6.0A\Include"
+-i"C:\Program Files\Microsoft SDKs\Windows\v7.0A\Include"
+co-msc90.lnt    // Compiler options for Visual Studio 2008
+-uMSDOS
+-d_CPPUNWIND            // Enable Exception Handling
+lib-w32.lnt     // Win32 API options
+env-vc9.lnt
+au-sm123.lnt    // Scott Meyers Effective C++ (1st, 2nd and 3rd Edition).
+lib-atl.lnt     // ATL framework options
+lib-stl.lnt     // STL framework options
+
++fcp		// Treat all files as cpp
+-ffc		// Switch off "Function takes custody"
+-fiz		// Initialization-by-Zero-is-considered-a-Write flag (suppress Info 838 regarding initializations)
+        // "Previously assigned value to variable 'Symbol' has not been used"
++linebuf +linebuf +linebuf		
++linebuf        // double the line buffer, required for some boost headers that exceed the default line buffer size
+
+-e830  		// Location cited in prior message (has no sense for our output pane because of possibility to sort by column)
+-e831		// Reference cited in prior message (has no sense for our output pane)
+
+-esym(*,ATL::CRegObject::ClearReplacements)
+-efunc(14, RtlSecureZeroMemory,InterlockedAnd64,InterlockedOr64,InterlockedXor64,InterlockedIncrement64,InterlockedDecrement64,InterlockedExchange64,InterlockedExchangeAdd64,__InlineInterlockedCompareExchangePointer)
+-e525		// Negative indentation
+-e534		// Ignoring return value
+
+-e641		// Converting enum to int
+-e659		// Nothing follows '}' on line within struct/union/enum declaration
+
+-e701		// Shift left  of signed quantity (int)
+-e702		// Shift rignt of signed quantity (int)
+-e703		// Shift left  of signed quantity (long)
+-e704		// Shift right of signed quantity (long)
+
+-e730		// Boolean argument to function
+-e731		// Boolean argument to equal/not equal
+-e788		// Enum constant not used within defaulted switch
+
+-e952		// Parameter could be declared const  -- [30, Item 3]
+-e953		// Variable could be declared as const -- [30, Item 3]
+-esym(1013, _Openprot)
+
+-elib(1050)	// Expected a template argument list
+
+-elib(1512)	// Destructor for base class in not virtual
+-esym(1512,Q*)	// Destructor for Qt base class in not virtual
+
+-esym(1550,Q*)	// May throw an exception in function ...
+
+-e1549		// Exception thrown for function not declared to throw
+
+-e1551		// Function may throw an exception in destructor
+
+-e1704		// Constructor 'Symbol' has private access specification
+-e1725		// class member is a reference
+-e1754		// Missing op= operator, e.g. if a class defines a '*' operator in should define the '*=' operator too
+-e1904		// Old c-style comment
+-e1932		// Base class 'symbol' is not abstract -- More Effective C++ #33
+-e1961		// virtual member function 'Symbol' could be made const
+
+-emacro(840, SIGNAL)
+-emacro(840, SLOT)
+-elib(165)
+
+-passes(2)	// run the code through at least two passes so that cross-functional checks can be made
+
