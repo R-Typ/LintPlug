@@ -12,3 +12,4 @@ under Tools/Options/Analizer/PC Lint:
 -e830  		// Location cited in prior message
 -e831		// Reference cited in prior message
 
+I used example.lnt as command line argument for my tests. There are some screenshots under /screenshots directory.
