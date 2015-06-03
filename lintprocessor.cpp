@@ -253,21 +253,35 @@ bool LintProcessor::parse(const QByteArray &data)
     QString type, level, code;
     LintItem itm;
     m_items.clear();
+#if defined (Q_OS_LINUX)
+    QRegExp lineRex(QLatin1String("^((?:/[/a-zA-Z0-9_\\.\\-\\s]+)+\\.(?:h|cpp|cc))\\((\\d+)\\)*\\s\\:*\\s(\\w+)*\\s(\\d+)\\:*\\s((?:[\\S*\\s*])+)"));
+#else
     QRegExp lineRex(QLatin1String("^((?:[a-zA-Z]:)?(?:\\\\[\\(\\)a-zA-Z0-9_\\.\\-\\s]+)+\\.(?:h|cpp|cc))\\((\\d+)\\)\\:\\s(\\w+)\\s(\\d+)\\:\\s\\((\\b\\w+\\b)\\s--\\s(.*)"));
+#endif
     const QString comment(QLatin1String("---"));
     foreach(QString line, lines)
     {
         if (line.trimmed().isEmpty() || line.startsWith(comment)) continue;
+#if defined (Q_OS_LINUX)
+        if (line.indexOf(QLatin1String("Note 900:")) != -1) success=true;
+#else
         if (line.indexOf(QLatin1String("error 900:")) != -1) success=true;
+#endif
         if (lineRex.indexIn(line) != -1)
         {
             itm.file = lineRex.cap(1);
             itm.line = lineRex.cap(2).toInt();
+#if defined (Q_OS_LINUX)
+            level = lineRex.cap(3);
+            code = lineRex.cap(4);//TODO: may be use it for description tooltip
+            itm.text = lineRex.cap(5).trimmed();
+#else
             type = lineRex.cap(3);
             code = lineRex.cap(4);//TODO: may be use it for description tooltip
             level = lineRex.cap(5);
             itm.text = lineRex.cap(6).trimmed();
             itm.text.chop(1);// remove last ')'
+#endif
             if (level == QLatin1String("Warning"))
             {
                 itm.iconResource=QLatin1String(Core::Constants::ICON_WARNING);
