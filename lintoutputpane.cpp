@@ -22,6 +22,7 @@
 #include <QToolButton>
 #include <QLabel>
 #include <QMessageBox>
+#include <QVBoxLayout>
 
 using namespace LintPlug::Internal;
 
