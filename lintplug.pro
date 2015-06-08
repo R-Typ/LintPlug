@@ -47,9 +47,9 @@ DEFINES += LINTPLUG_LIBRARY
 
 INCLUDEPATH += $$QTCREATOR_SOURCES/src/shared
 
-LIBS += -L"C:/qtcreator/qt-creator-build/lib" -L"C:/qtcreator/qt-creator-build/lib/qtcreator" -L"C:/qtcreator/qt-creator-build/lib/qtcreator/plugins" -lQmlProjectManagerd
-# LintPlug files
+LIBS += -L"$$IDE_BUILD_TREE/lib" -L"$$IDE_BUILD_TREE/lib/qtcreator" -L"$$IDE_BUILD_TREE/lib/qtcreator/plugins" -lQmlProjectManager
 
+# LintPlug files
 SOURCES += linttreeview.cpp \
     lintoutputpane.cpp \
     lintitemsmodel.cpp \
@@ -59,16 +59,19 @@ SOURCES += linttreeview.cpp \
     configpage.cpp
 
 HEADERS +=  lintplug_global.h \
-            lintplugconstants.h \
-            linttreeview.h \
-            lintitem.h \
-            lintoutputpane.h \
-            lintitemsmodel.h \
-            lintplugplugin.h \
-            lintprocessor.h \
+    lintplugconstants.h \
+    linttreeview.h \
+    lintitem.h \
+    lintoutputpane.h \
+    lintitemsmodel.h \
+    lintplugplugin.h \
+    lintprocessor.h \
     config.h \
     configpage.h
 
 FORMS += \
     config.ui
 
+OTHER_FILES += \
+    example.lnt \
+    README.md
