@@ -27,6 +27,7 @@ Config::Config(QWidget *parent) : QWidget(parent)
 
     ui->edLint->setText(m_settings->value(QLatin1String(Constants::SETTINGS_LINT_EXE), QLatin1String("")).toString());
     ui->edArgs->setText(m_settings->value(QLatin1String(Constants::SETTINGS_LINT_ARGS), QLatin1String("")).toString());
+    ui->chkPDir->setChecked(m_settings->value(QLatin1String(Constants::SETTINGS_LINT_PDIR), true).toBool());
     ui->chkDefines->setChecked(m_settings->value(QLatin1String(Constants::SETTINGS_LINT_DEFS), false).toBool());
 }
 
@@ -47,6 +48,7 @@ void Config::apply()
     {
         m_settings->setValue(QLatin1String(Constants::SETTINGS_LINT_EXE), ui->edLint->text());
         m_settings->setValue(QLatin1String(Constants::SETTINGS_LINT_ARGS), ui->edArgs->text());
+        m_settings->setValue(QLatin1String(Constants::SETTINGS_LINT_PDIR), ui->chkPDir->isChecked());
         m_settings->setValue(QLatin1String(Constants::SETTINGS_LINT_DEFS), ui->chkDefines->isChecked());
     }
 }

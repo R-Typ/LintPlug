@@ -18,6 +18,7 @@
 #include <projectexplorer/session.h>
 #include <projectexplorer/target.h>
 #include <projectexplorer/buildconfiguration.h>
+#include <projectexplorer/projecttree.h>
 #include <cpptools/cppmodelmanager.h>
 #include <coreplugin/icore.h>
 #include <coreplugin/editormanager/editormanager.h>
@@ -56,7 +57,7 @@ LintProcessor::~LintProcessor()
 
 void LintProcessor::start()
 {
-    if (m_isRunning) stop();    
+    if (m_isRunning) stop();
     m_thread->start();
 }
 
@@ -66,11 +67,13 @@ void LintProcessor::stop()
     m_thread->wait();
 }
 
+
 void LintProcessor::process()
 {
     m_lastError.clear();
     QStringList includeDirs, defines, sources;
     QString activeSource;
+
     if (projectData(includeDirs, defines, sources, activeSource))
     {
         if (m_mode == SINGLE_FILE && activeSource.isEmpty())
@@ -80,8 +83,28 @@ void LintProcessor::process()
             m_isRunning=false;
             return;
         }
+
+
         QSettings* settings = Core::ICore::settings();
         const QString lintExe=settings->value(QLatin1String(Constants::SETTINGS_LINT_EXE), QLatin1String("")).toString();
+
+        // Switch to project dir
+        bool useProjectDir = settings->value(QLatin1String(Constants::SETTINGS_LINT_PDIR), false).toBool();
+        if (useProjectDir) {
+            if (const ProjectExplorer::Project *project
+                    = ProjectExplorer::ProjectTree::currentProject()) {
+                bool inPDir = QDir::setCurrent(project->projectDirectory().toString());
+                if (!inPDir)
+                {
+                    m_lastError=tr("Could not use the working directory. Please check the configuration.");
+                    if (m_thread) m_thread->quit();
+                    m_isRunning=false;
+                    qDebug() << "Current path: " << QDir::currentPath();
+                    return;
+                }
+            }
+        }
+
         QTemporaryFile file(QLatin1String("XXXXXX.lnt"));
         if (file.open())
         {

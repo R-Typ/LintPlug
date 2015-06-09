@@ -18,6 +18,7 @@ const char SETTINGS_TEXT_COLUMN_WIDTH[] = "TextColumnWidth";
 const char SETTINGS_FILE_COLUMN_WIDTH[] = "FileColumnWidth";
 const char SETTINGS_LINT_EXE[] = "LintExe";
 const char SETTINGS_LINT_ARGS[] = "LintArgs";
+const char SETTINGS_LINT_PDIR[] = "LintPDir";
 const char SETTINGS_LINT_DEFS[] = "LintDefs";
 
 enum OutputColumnIndex {
