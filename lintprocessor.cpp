@@ -133,20 +133,23 @@ void LintProcessor::process()
         //qDebug()<<file.fileName();
         QProcess lint;
         QStringList lintParams;
-        // define output format
+        // add lint directory to search path
+        QFileInfo fi(lintExe);
+        QString lintPath=fi.absolutePath();
+        lintParams<<QString(QLatin1String("-i\"%1\"")).arg(lintPath);
+        // add user parameter(s), from configuration
+        QString userParams=settings->value(QLatin1String(Constants::SETTINGS_LINT_ARGS), QLatin1String("")).toString();
+        lintParams.append(userParams.split(QLatin1String(" ")));
+        // add output format. Will overwrite any user settings
         lintParams<<QLatin1String("-format=%(%f(%l)\\s:\\s%)%t\\s%n:\\s%m")
                   <<QLatin1String("+ffn")
                   <<QLatin1String("-width(0)")
                   <<QLatin1String("-hf1")
                   <<QLatin1String("+e900");// succesfull execution message from lint
-        // add lint directory to search path
-        QFileInfo fi(lintExe);
-        QString lintPath=fi.absolutePath();
-        lintParams<<QString(QLatin1String("-i\"%1\"")).arg(lintPath);
-        QString userParams=settings->value(QLatin1String(Constants::SETTINGS_LINT_ARGS), QLatin1String("")).toString();
-        lintParams.append(userParams.split(QLatin1String(" ")));
+        // Add project includes, defines and source file(s) to lint
         lintParams<<file.fileName();
         //qDebug()<<"start Lint with parameters:"<<lintParams;
+
         lint.start(lintExe, lintParams);
         if (lint.waitForStarted() && lint.waitForFinished(-1))
         {
