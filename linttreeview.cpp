@@ -68,6 +68,8 @@ void LintTreeView::saveDisplaySettings()
     settings->beginGroup(QLatin1String(Constants::SETTINGS_GROUP));
     settings->setValue(QLatin1String(Constants::SETTINGS_LEVEL_COLUMN_WIDTH),
                        columnWidth(Constants::OUTPUT_COLUMN_LEVEL));
+    settings->setValue(QLatin1String(Constants::SETTINGS_CODE_COLUMN_WIDTH),
+                       columnWidth(Constants::OUTPUT_COLUMN_CODE));
     settings->setValue(QLatin1String(Constants::SETTINGS_TEXT_COLUMN_WIDTH),
                        columnWidth(Constants::OUTPUT_COLUMN_TEXT));
     settings->setValue(QLatin1String(Constants::SETTINGS_FILE_COLUMN_WIDTH),
@@ -82,6 +84,7 @@ void LintTreeView::loadDisplaySettings()
     QSettings *settings = Core::ICore::settings();
     settings->beginGroup(QLatin1String(Constants::SETTINGS_GROUP));
     m_colWidth.append(settings->value(QLatin1String(Constants::SETTINGS_LEVEL_COLUMN_WIDTH), 50).toInt());
+    m_colWidth.append(settings->value(QLatin1String(Constants::SETTINGS_CODE_COLUMN_WIDTH), 50).toInt());
     m_colWidth.append(settings->value(QLatin1String(Constants::SETTINGS_TEXT_COLUMN_WIDTH), 200).toInt());
     m_colWidth.append(settings->value(QLatin1String(Constants::SETTINGS_FILE_COLUMN_WIDTH), 100).toInt());
     settings->endGroup();

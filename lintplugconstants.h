@@ -14,6 +14,7 @@ const char COLOR_NOTE_BG[] = "#e0ebff";
 
 const char SETTINGS_GROUP[] = "LintPlugin";
 const char SETTINGS_LEVEL_COLUMN_WIDTH[] = "LevelColumnWidth";
+const char SETTINGS_CODE_COLUMN_WIDTH[] = "CodeColumnWidth";
 const char SETTINGS_TEXT_COLUMN_WIDTH[] = "TextColumnWidth";
 const char SETTINGS_FILE_COLUMN_WIDTH[] = "FileColumnWidth";
 const char SETTINGS_LINT_EXE[] = "LintExe";
@@ -23,6 +24,7 @@ const char SETTINGS_LINT_DEFS[] = "LintDefs";
 
 enum OutputColumnIndex {
     OUTPUT_COLUMN_LEVEL,
+    OUTPUT_COLUMN_CODE,
     OUTPUT_COLUMN_TEXT,
     OUTPUT_COLUMN_FILE,
     OUTPUT_COLUMN_LINE,
@@ -31,6 +33,7 @@ enum OutputColumnIndex {
 
 const char OUTPUT_PANE_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::OutputPane", "PC Lint Check");
 const char OUTPUT_COLUMN_LEVEL_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::ItemsModel", "Level");
+const char OUTPUT_COLUMN_CODE_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::ItemsModel", "Code");
 const char OUTPUT_COLUMN_TEXT_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::ItemsModel", "Description");
 const char OUTPUT_COLUMN_FILE_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::ItemsModel", "File");
 const char OUTPUT_COLUMN_LINE_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::ItemsModel", "Line");
