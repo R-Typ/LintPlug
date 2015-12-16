@@ -2,12 +2,12 @@
 
 ## set the QTC_SOURCE environment variable to override the setting here
 QTCREATOR_SOURCES = $$(QTC_SOURCE)
-isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=C:/qtcreator/qt-creator
+isEmpty(QTCREATOR_SOURCES):QTCREATOR_SOURCES=E:/qtcreator/qt-creator
 
 ## set the QTC_BUILD environment variable to override the setting here
 IDE_BUILD_TREE = $$(QTC_BUILD)
 #debug
-isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=C:/qtcreator/qt-creator-build
+isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=E:/qtcreator/build
 #release
 #isEmpty(IDE_BUILD_TREE):IDE_BUILD_TREE=C:/qtcreator/qt-creator-build_release
 

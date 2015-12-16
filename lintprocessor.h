@@ -15,6 +15,7 @@
 
 #include "lintitem.h"
 #include <QList>
+#include <QProcess>
 
 namespace LintPlug {
 namespace Internal {
@@ -44,9 +45,12 @@ public:
 
 signals:
     void finished();
+    void outputData(const QString& text);
 
 private slots:
     void process();
+    void readStdout();
+    void readStderr();
 
 private:
     bool projectData(QStringList& includeDirs, QStringList& defines, QStringList& sources, QString &activeSource);
@@ -57,6 +61,8 @@ private:
     bool      m_isRunning;
     MODES     m_mode;
     QString   m_lastError;
+    QProcess* m_lint;
+    QByteArray m_result;
 };
 
 } // namespace Internal

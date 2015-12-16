@@ -27,7 +27,6 @@
 #include <proparser/proitems.h>
 
 #include <QTemporaryFile>
-#include <QProcess>
 #include <QThread>
 #include <QSettings>
 
@@ -40,6 +39,7 @@ LintProcessor::LintProcessor()
 , m_isRunning(false)
 , m_mode(SINGLE_FILE)
 , m_lastError()
+, m_lint(NULL)
 {
     m_thread->setObjectName(QLatin1String("LintProcessorThread"));
     this->moveToThread(m_thread);
@@ -63,11 +63,13 @@ void LintProcessor::start()
 void LintProcessor::stop()
 {
     m_isRunning=false;
+    if (m_lint) m_lint->kill();
     m_thread->wait();
 }
 
 void LintProcessor::process()
 {
+    m_isRunning=true;
     m_lastError.clear();
     QStringList includeDirs, defines, sources;
     QString activeSource;
@@ -106,16 +108,8 @@ void LintProcessor::process()
                 }
             }
         }
-        file.flush();
-        //qDebug()<<file.fileName();
-        QProcess lint;
+        file.flush();                
         QStringList lintParams;
-        // define output format
-        lintParams<<QLatin1String("-format=%(%f(%l)\\s:\\s%)%t\\s%n:\\s%m")
-                  <<QLatin1String("+ffn")
-                  <<QLatin1String("-width(0)")
-                  <<QLatin1String("-hf1")
-                  <<QLatin1String("+e900");// succesfull execution message from lint
         // add lint directory to search path
         QFileInfo fi(lintExe);
         QString lintPath=fi.absolutePath();
@@ -123,29 +117,65 @@ void LintProcessor::process()
         QString userParams=settings->value(QLatin1String(Constants::SETTINGS_LINT_ARGS), QLatin1String("")).toString();
         lintParams.append(userParams.split(QLatin1String(" ")));
         lintParams<<file.fileName();
+        // define output format (must be after user lnt files)
+        lintParams<<QLatin1String("-format=%(%f(%l)\\s:\\s%)%t\\s%n:\\s%m")
+                  <<QLatin1String("+ffn")
+                  <<QLatin1String("-width(0)")
+                  <<QLatin1String("-hf1")
+                  <<QLatin1String("+e900");// succesfull execution message from lint
         //qDebug()<<"start Lint with parameters:"<<lintParams;
-        lint.start(lintExe, lintParams);
-        if (lint.waitForStarted() && lint.waitForFinished(-1))
+
+        m_lint=new QProcess(this);
+        connect(m_lint, SIGNAL(readyReadStandardOutput()), this, SLOT(readStdout()));
+        connect(m_lint, SIGNAL(readyReadStandardError()), this, SLOT(readStderr()));
+
+        m_result.clear();
+        m_lint->start(lintExe, lintParams);
+        if (m_lint->waitForStarted() && m_lint->waitForFinished(-1))
         {
-            QByteArray result = lint.readAll();
+            if (m_isRunning) // can be false if lint was killed
+            {
 #if 0
-            QFile file(QLatin1String("c:/out.txt"));
-            if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-            {
-                file.write(result);
-            }
+                QFile file(QLatin1String("c:/out.txt"));
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+                {
+                    file.write(m_result);
+                }
 #endif
-            if (!parse(result))
-            {
-                int idx=result.lastIndexOf("error");
-                m_lastError=tr("Some error occured during Lint check.");
-                if (idx !=-1) m_lastError.append(tr(" Last error message:\n")).append(QLatin1String(result.mid(idx)));
-            }
+                if (!parse(m_result))
+                {
+                    int idx=m_result.lastIndexOf("error");
+                    m_lastError=tr("Some error occured during Lint check.");
+                    if (idx !=-1) m_lastError.append(tr(" Last error message:\n")).append(QLatin1String(m_result.mid(idx)));
+                }
+            } //else qDebug()<<"Lint aborted.";
         }
         //qDebug()<<lint.exitCode();
+        delete m_lint;
+        m_lint=NULL;
     }
     if (m_thread) m_thread->quit();
     m_isRunning=false;
+}
+
+void LintProcessor::readStdout()
+{
+    if (m_lint)
+    {
+        QByteArray tmp=m_lint->readAllStandardOutput();
+        m_result.append(tmp);
+        emit(outputData(QLatin1String(tmp)));
+    }
+}
+
+void LintProcessor::readStderr()
+{
+    if (m_lint)
+    {
+        QByteArray tmp=m_lint->readAllStandardError();
+        m_result.append(tmp);
+        emit(outputData(QLatin1String(/*"Error: "+*/tmp)));
+    }
 }
 
 bool LintProcessor::projectData(QStringList &includeDirs, QStringList &defines, QStringList &sources, QString& activeSource)
@@ -262,11 +292,7 @@ bool LintProcessor::parse(const QByteArray &data)
     foreach(QString line, lines)
     {
         if (line.trimmed().isEmpty() || line.startsWith(comment)) continue;
-#if defined (Q_OS_LINUX)
         if (line.indexOf(QLatin1String("Note 900:")) != -1) success=true;
-#else
-        if (line.indexOf(QLatin1String("error 900:")) != -1) success=true;
-#endif
         if (lineRex.indexIn(line) != -1)
         {
             itm.file = lineRex.cap(1);

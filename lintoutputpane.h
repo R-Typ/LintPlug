@@ -22,6 +22,7 @@ class QModelIndex;
 class QAbstractButton;
 class QVBoxLayout;
 class QLabel;
+class QTextEdit;
 QT_END_NAMESPACE
 
 namespace LintPlug {
@@ -61,6 +62,7 @@ private slots:
     void treeViewClicked(const QModelIndex &index);
     void updateCount();
     void runLint();
+    void stopLint();
     void showResults();
     void setMode(int index);
 
@@ -68,9 +70,10 @@ private:
     QWidget*        m_mainWidget;
     LintTreeView*   m_treeView;
     QVBoxLayout*    m_layout;
-    QLabel*         m_waitLabel;
+    QTextEdit*      m_outputConsole;
     QComboBox*      m_cbTool;
     QToolButton*    m_btnRun;
+    QToolButton*    m_btnStop;
     LintItemsModel* m_itemsModel;
     LintProcessor*  m_processor;
 

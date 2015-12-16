@@ -34,6 +34,9 @@ const char OUTPUT_COLUMN_TEXT_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::Items
 const char OUTPUT_COLUMN_FILE_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::ItemsModel", "File");
 const char OUTPUT_COLUMN_LINE_TITLE[] = QT_TRANSLATE_NOOP("Lint::Internal::ItemsModel", "Line");
 
+const char ICON_RUN[] = ":/images/run_small.png";
+const char ICON_STOP[] = ":/images/stop_small.png";
+
 const int OUTPUT_TOOLBAR_SPACER_WIDTH = 25;
 
 } // namespace LintPlug
