@@ -299,11 +299,11 @@ bool LintProcessor::parse(const QByteArray &data)
             itm.line = lineRex.cap(2).toInt();
 #if defined (Q_OS_LINUX)
             level = lineRex.cap(3);
-            code = lineRex.cap(4);//TODO: may be use it for description tooltip
+            itm.code = lineRex.cap(4).toUInt();
             itm.text = lineRex.cap(5).trimmed();
 #else
             type = lineRex.cap(3);
-            code = lineRex.cap(4);//TODO: may be use it for description tooltip
+            itm.code = lineRex.cap(4).toUInt();
             level = lineRex.cap(5);
             itm.text = lineRex.cap(6).trimmed();
             itm.text.chop(1);// remove last ')'

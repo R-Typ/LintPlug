@@ -48,14 +48,17 @@ public:
 
     QString levelString(LEVELS level)
     {
+        QString res;
         switch (level)
         {
-            case ERROR:     return QObject::tr("Error");
-            case WARNING:   return QObject::tr("Warning");
-            case INFO:      return QObject::tr("Info");
-            case NOTE:      return QObject::tr("Note");
-            default:        return QObject::tr("Unknown");
+            case ERROR:     res=QObject::tr("Error");   break;
+            case WARNING:   res=QObject::tr("Warning"); break;
+            case INFO:      res=QObject::tr("Info");    break;
+            case NOTE:      res=QObject::tr("Note");    break;
+            default:        res=QObject::tr("Unknown"); break;
         }
+        res.append(QString(QLatin1String(" (%1)")).arg(code));
+        return res;
     }
 
 };
