@@ -63,6 +63,7 @@ private slots:
     void updateCount();
     void runLint();
     void stopLint();
+    void switchView();
     void showResults();
     void setMode(int index);
 
@@ -74,6 +75,7 @@ private:
     QComboBox*      m_cbTool;
     QToolButton*    m_btnRun;
     QToolButton*    m_btnStop;
+    QToolButton*    m_btnSwitch;
     LintItemsModel* m_itemsModel;
     LintProcessor*  m_processor;
 

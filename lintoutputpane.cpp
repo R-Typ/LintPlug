@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
+#include <coreplugin/coreconstants.h>
 #include <projectexplorer/projectexplorerconstants.h>
 using namespace ProjectExplorer;
 
@@ -37,6 +38,7 @@ LintOutputPane::LintOutputPane(QObject *parent) : IOutputPane(parent)
 , m_cbTool(new QComboBox())
 , m_btnRun(new QToolButton())
 , m_btnStop(new QToolButton())
+, m_btnSwitch(new QToolButton())
 , m_itemsModel(new LintItemsModel(this))
 , m_processor(new LintProcessor())
 {    
@@ -60,10 +62,12 @@ LintOutputPane::LintOutputPane(QObject *parent) : IOutputPane(parent)
     m_btnStop->setToolTip(tr("Abort PC Lint check"));
     m_btnStop->setEnabled(false);
 
-    //TODO: button to switch between output and treeview
+    m_btnSwitch->setIcon(QIcon(QLatin1String(Core::Constants::ICON_RELOAD_GRAY)));
+    m_btnSwitch->setToolTip(tr("Switch between Lint output and messages list"));
 
     connect(m_btnRun, SIGNAL(clicked()), SLOT(runLint()));
     connect(m_btnStop, SIGNAL(clicked()), SLOT(stopLint()));
+    connect(m_btnSwitch, SIGNAL(clicked()), SLOT(switchView()));
 
     connect(m_cbTool, SIGNAL(currentIndexChanged(int)), SLOT(setMode(int)));
 
@@ -85,6 +89,8 @@ LintOutputPane::~LintOutputPane()
     delete m_mainWidget;
     delete m_cbTool;
     delete m_btnRun;
+    delete m_btnStop;
+    delete m_btnSwitch;
 }
 
 QWidget *LintOutputPane::outputWidget(QWidget *parent)
@@ -95,7 +101,7 @@ QWidget *LintOutputPane::outputWidget(QWidget *parent)
 
 QList<QWidget *> LintOutputPane::toolBarWidgets() const
 {
-    return QList<QWidget*>()<< m_cbTool<<m_btnRun<<m_btnStop;
+    return QList<QWidget*>()<< m_cbTool<<m_btnRun<<m_btnStop<<m_btnSwitch;
 }
 
 QString LintOutputPane::displayName() const
@@ -110,7 +116,7 @@ int LintOutputPane::priorityInStatusBar() const
 
 void LintOutputPane::clearContents()
 {
-    if (m_processor->isRunning())
+    if (m_outputConsole->isVisible())
     {
         m_outputConsole->clear();
     } else {
@@ -125,12 +131,14 @@ void LintOutputPane::visibilityChanged(bool visible)
 
 void LintOutputPane::setFocus()
 {
-    m_treeView->setFocus();
+    if (m_treeView->isVisible()) m_treeView->setFocus();
+    else m_outputConsole->setFocus();
 }
 
 bool LintOutputPane::hasFocus() const
 {
-    return m_treeView->window()->focusWidget() == m_treeView;
+    QWidget* w=m_treeView->window();
+    return w && (w->focusWidget() == m_treeView  || w->focusWidget() == m_outputConsole) ;
 }
 
 bool LintOutputPane::canFocus() const
@@ -140,17 +148,17 @@ bool LintOutputPane::canFocus() const
 
 bool LintOutputPane::canNavigate() const
 {
-    return (!m_processor->isRunning());
+    return m_treeView->isVisible() && (!m_processor->isRunning());
 }
 
 bool LintOutputPane::canNext() const
 {
-    return (!m_processor->isRunning() && m_treeView->model()->rowCount() > 1);
+    return (m_treeView->isVisible() && (!m_processor->isRunning()) && m_treeView->model()->rowCount() > 1);
 }
 
 bool LintOutputPane::canPrevious() const
 {
-    return (!m_processor->isRunning() && m_treeView->model()->rowCount() > 1);
+    return (m_treeView->isVisible() && (!m_processor->isRunning()) && m_treeView->model()->rowCount() > 1);
 }
 
 void LintOutputPane::goToNext()
@@ -193,6 +201,7 @@ void LintOutputPane::runLint()
     m_itemsModel->clear();
     m_treeView->hide();
     m_btnRun->setEnabled(false);
+    m_cbTool->setEnabled(false);
     m_btnStop->setEnabled(true);
     m_outputConsole->clear();
     m_outputConsole->show();
@@ -205,11 +214,24 @@ void LintOutputPane::stopLint()
     showResults();
 }
 
+void LintOutputPane::switchView()
+{
+    if (m_outputConsole->isVisible())
+    {
+        m_treeView->show();
+        m_outputConsole->hide();
+    } else {
+        m_treeView->hide();
+        m_outputConsole->show();
+    }
+}
+
 void LintOutputPane::showResults()
 {
     m_treeView->show();
     m_outputConsole->hide();
     m_btnRun->setEnabled(true);
+    m_cbTool->setEnabled(true);
     m_btnStop->setEnabled(false);
     m_itemsModel->setItemsList(m_processor->items());
     if (!m_processor->lastError().isEmpty())
