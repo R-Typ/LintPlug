@@ -280,7 +280,7 @@ bool LintProcessor::parse(const QByteArray &data)
     bool success(false);
     QString lintOutput=QLatin1String(data);
     QStringList lines=lintOutput.split(QLatin1String("\n"));
-    QString type, level, code;
+    QString level;
     LintItem itm;
     m_items.clear();
 #if defined (Q_OS_LINUX)
@@ -302,7 +302,6 @@ bool LintProcessor::parse(const QByteArray &data)
             itm.code = lineRex.cap(4).toUInt();
             itm.text = lineRex.cap(5).trimmed();
 #else
-            type = lineRex.cap(3);
             itm.code = lineRex.cap(4).toUInt();
             level = lineRex.cap(5);
             itm.text = lineRex.cap(6).trimmed();

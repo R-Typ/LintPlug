@@ -23,6 +23,7 @@
 #include <QTextEdit>
 #include <QMessageBox>
 #include <QVBoxLayout>
+#include <QMenu>
 
 #include <coreplugin/coreconstants.h>
 #include <projectexplorer/projectexplorerconstants.h>
@@ -39,6 +40,8 @@ LintOutputPane::LintOutputPane(QObject *parent) : IOutputPane(parent)
 , m_btnRun(new QToolButton())
 , m_btnStop(new QToolButton())
 , m_btnSwitch(new QToolButton())
+, m_btnFilter(new QToolButton())
+, m_menuFilter(new QMenu(m_btnFilter))
 , m_itemsModel(new LintItemsModel(this))
 , m_processor(new LintProcessor())
 {    
@@ -64,6 +67,12 @@ LintOutputPane::LintOutputPane(QObject *parent) : IOutputPane(parent)
 
     m_btnSwitch->setIcon(QIcon(QLatin1String(Core::Constants::ICON_RELOAD_GRAY)));
     m_btnSwitch->setToolTip(tr("Switch between Lint output and messages list"));
+
+    m_btnFilter->setIcon(QIcon(QLatin1String(Core::Constants::ICON_FILTER)));
+    m_btnFilter->setToolTip(tr("Filter messages"));
+    m_btnFilter->setPopupMode(QToolButton::InstantPopup);
+    m_btnFilter->setMenu(m_menuFilter);
+    connect(m_menuFilter, SIGNAL(aboutToShow()), this, SLOT(updateFilterMenu()));
 
     connect(m_btnRun, SIGNAL(clicked()), SLOT(runLint()));
     connect(m_btnStop, SIGNAL(clicked()), SLOT(stopLint()));
@@ -91,6 +100,7 @@ LintOutputPane::~LintOutputPane()
     delete m_btnRun;
     delete m_btnStop;
     delete m_btnSwitch;
+    delete m_btnFilter;
 }
 
 QWidget *LintOutputPane::outputWidget(QWidget *parent)
@@ -101,7 +111,7 @@ QWidget *LintOutputPane::outputWidget(QWidget *parent)
 
 QList<QWidget *> LintOutputPane::toolBarWidgets() const
 {
-    return QList<QWidget*>()<< m_cbTool<<m_btnRun<<m_btnStop<<m_btnSwitch;
+    return QList<QWidget*>()<< m_cbTool<<m_btnRun<<m_btnStop<<m_btnSwitch<<m_btnFilter;
 }
 
 QString LintOutputPane::displayName() const
@@ -202,6 +212,7 @@ void LintOutputPane::runLint()
     m_treeView->hide();
     m_btnRun->setEnabled(false);
     m_cbTool->setEnabled(false);
+    m_btnFilter->setEnabled(false);
     m_btnStop->setEnabled(true);
     m_outputConsole->clear();
     m_outputConsole->show();
@@ -220,9 +231,11 @@ void LintOutputPane::switchView()
     {
         m_treeView->show();
         m_outputConsole->hide();
+        m_btnFilter->setEnabled(true);
     } else {
         m_treeView->hide();
         m_outputConsole->show();
+        m_btnFilter->setEnabled(false);
     }
 }
 
@@ -232,6 +245,7 @@ void LintOutputPane::showResults()
     m_outputConsole->hide();
     m_btnRun->setEnabled(true);
     m_cbTool->setEnabled(true);
+    m_btnFilter->setEnabled(true);
     m_btnStop->setEnabled(false);
     m_itemsModel->setItemsList(m_processor->items());
     if (!m_processor->lastError().isEmpty())
@@ -248,6 +262,32 @@ void LintOutputPane::setMode(int index)
         default: mode=LintProcessor::SINGLE_FILE; break;
     }
     m_processor->setMode(mode);
+}
+
+void LintOutputPane::updateFilterMenu()
+{
+/*
+    d->m_categoriesMenu->clear();
+    const QList<Core::Id> filteredCategories = d->m_filter->filteredCategories();
+
+    QMap<QString, Core::Id> nameToIds;
+    foreach (Core::Id categoryId, d->m_model->categoryIds())
+        nameToIds.insert(d->m_model->categoryDisplayName(categoryId), categoryId);
+
+    const NameToIdsConstIt cend = nameToIds.constEnd();
+    for (NameToIdsConstIt it = nameToIds.constBegin(); it != cend; ++it) {
+        const QString &displayName = it.key();
+        const Core::Id categoryId = it.value();
+        QAction *action = new QAction(d->m_categoriesMenu);
+        action->setCheckable(true);
+        action->setText(displayName);
+        action->setChecked(!filteredCategories.contains(categoryId));
+        connect(action, &QAction::triggered, this, [this, action, categoryId] {
+            setCategoryVisibility(categoryId, action->isChecked());
+        });
+        d->m_categoriesMenu->addAction(action);
+    }
+*/
 }
 
 QModelIndex LintOutputPane::selectedModelIndex()

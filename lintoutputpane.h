@@ -23,6 +23,7 @@ class QAbstractButton;
 class QVBoxLayout;
 class QLabel;
 class QTextEdit;
+class QMenu;
 QT_END_NAMESPACE
 
 namespace LintPlug {
@@ -66,6 +67,7 @@ private slots:
     void switchView();
     void showResults();
     void setMode(int index);
+    void updateFilterMenu();
 
 private:
     QWidget*        m_mainWidget;
@@ -76,6 +78,8 @@ private:
     QToolButton*    m_btnRun;
     QToolButton*    m_btnStop;
     QToolButton*    m_btnSwitch;
+    QToolButton*    m_btnFilter;
+    QMenu*          m_menuFilter;
     LintItemsModel* m_itemsModel;
     LintProcessor*  m_processor;
 
