@@ -86,6 +86,10 @@ public:
             {
                 return t1.level < t2.level;
             }
+
+            case Constants::OUTPUT_COLUMN_CODE:
+                return t1.code < t2.code;
+
             case Constants::OUTPUT_COLUMN_TEXT:
                 return t1.text < t2.text;
 

@@ -18,6 +18,7 @@
 #include <projectexplorer/session.h>
 #include <projectexplorer/target.h>
 #include <projectexplorer/buildconfiguration.h>
+#include <projectexplorer/projecttree.h>
 #include <cpptools/cppmodelmanager.h>
 #include <coreplugin/icore.h>
 #include <coreplugin/editormanager/editormanager.h>
@@ -56,7 +57,7 @@ LintProcessor::~LintProcessor()
 
 void LintProcessor::start()
 {
-    if (m_isRunning) stop();    
+    if (m_isRunning) stop();
     m_thread->start();
 }
 
@@ -67,12 +68,14 @@ void LintProcessor::stop()
     m_thread->wait();
 }
 
+
 void LintProcessor::process()
 {
     m_isRunning=true;
     m_lastError.clear();
     QStringList includeDirs, defines, sources;
     QString activeSource;
+
     if (projectData(includeDirs, defines, sources, activeSource))
     {
         if (m_mode == SINGLE_FILE && activeSource.isEmpty())
@@ -82,8 +85,28 @@ void LintProcessor::process()
             m_isRunning=false;
             return;
         }
+
+
         QSettings* settings = Core::ICore::settings();
         const QString lintExe=settings->value(QLatin1String(Constants::SETTINGS_LINT_EXE), QLatin1String("")).toString();
+
+        // Switch to project dir
+        bool useProjectDir = settings->value(QLatin1String(Constants::SETTINGS_LINT_PDIR), false).toBool();
+        if (useProjectDir) {
+            if (const ProjectExplorer::Project *project
+                    = ProjectExplorer::ProjectTree::currentProject()) {
+                bool inPDir = QDir::setCurrent(project->projectDirectory().toString());
+                if (!inPDir)
+                {
+                    m_lastError=tr("Could not use the working directory. Please check the configuration.");
+                    if (m_thread) m_thread->quit();
+                    m_isRunning=false;
+                    qDebug() << "Current path: " << QDir::currentPath();
+                    return;
+                }
+            }
+        }
+
         QTemporaryFile file(QLatin1String("XXXXXX.lnt"));
         if (file.open())
         {
@@ -114,8 +137,16 @@ void LintProcessor::process()
         QFileInfo fi(lintExe);
         QString lintPath=fi.absolutePath();
         lintParams<<QString(QLatin1String("-i\"%1\"")).arg(lintPath);
+        // add user parameter(s), from configuration
         QString userParams=settings->value(QLatin1String(Constants::SETTINGS_LINT_ARGS), QLatin1String("")).toString();
         lintParams.append(userParams.split(QLatin1String(" ")));
+        // add output format. Will overwrite any user settings
+        lintParams<<QLatin1String("-format=%(%f(%l)\\s:\\s%)%t\\s%n:\\s%m")
+                  <<QLatin1String("+ffn")
+                  <<QLatin1String("-width(0)")
+                  <<QLatin1String("-hf1")
+                  <<QLatin1String("+e900");// succesfull execution message from lint
+        // Add project includes, defines and source file(s) to lint
         lintParams<<file.fileName();
         // define output format (must be after user lnt files)
         lintParams<<QLatin1String("-format=%(%f(%l)\\s:\\s%)%t\\s%n:\\s%m")
