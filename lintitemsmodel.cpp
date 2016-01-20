@@ -78,6 +78,13 @@ QVariant LintItemsModel::data(const QModelIndex &index, int role) const
             }
             break;
 
+        case Constants::OUTPUT_COLUMN_CODE:
+            switch (role) {
+                case Qt::DisplayRole:
+                    return item.code;
+            }
+            break;
+
         case Constants::OUTPUT_COLUMN_TEXT:
             switch (role) {
                 case Qt::DisplayRole:
@@ -111,6 +118,9 @@ QVariant LintItemsModel::headerData(int section, Qt::Orientation orientation, in
     switch (section) {
         case Constants::OUTPUT_COLUMN_LEVEL:
             return tr(Constants::OUTPUT_COLUMN_LEVEL_TITLE);
+
+        case Constants::OUTPUT_COLUMN_CODE:
+            return tr(Constants::OUTPUT_COLUMN_CODE_TITLE);
 
         case Constants::OUTPUT_COLUMN_TEXT:
             return tr(Constants::OUTPUT_COLUMN_TEXT_TITLE);
