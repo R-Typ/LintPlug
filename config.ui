@@ -55,7 +55,7 @@
    <item>
     <widget class="QCheckBox" name="chkPDir">
      <property name="text">
-      <string>Use project folder as working dir</string>
+      <string>Use project folder as working directory</string>
      </property>
     </widget>
    </item>

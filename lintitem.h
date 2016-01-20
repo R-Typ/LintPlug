@@ -57,7 +57,6 @@ public:
             case NOTE:      res=QObject::tr("Note");    break;
             default:        res=QObject::tr("Unknown"); break;
         }
-        res.append(QString(QLatin1String(" (%1)")).arg(code));
         return res;
     }
 

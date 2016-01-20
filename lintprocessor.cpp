@@ -140,12 +140,6 @@ void LintProcessor::process()
         // add user parameter(s), from configuration
         QString userParams=settings->value(QLatin1String(Constants::SETTINGS_LINT_ARGS), QLatin1String("")).toString();
         lintParams.append(userParams.split(QLatin1String(" ")));
-        // add output format. Will overwrite any user settings
-        lintParams<<QLatin1String("-format=%(%f(%l)\\s:\\s%)%t\\s%n:\\s%m")
-                  <<QLatin1String("+ffn")
-                  <<QLatin1String("-width(0)")
-                  <<QLatin1String("-hf1")
-                  <<QLatin1String("+e900");// succesfull execution message from lint
         // Add project includes, defines and source file(s) to lint
         lintParams<<file.fileName();
         // define output format (must be after user lnt files)
