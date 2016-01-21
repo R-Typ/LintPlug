@@ -68,11 +68,23 @@ LintOutputPane::LintOutputPane(QObject *parent) : IOutputPane(parent)
     m_btnSwitch->setIcon(QIcon(QLatin1String(Core::Constants::ICON_RELOAD_GRAY)));
     m_btnSwitch->setToolTip(tr("Switch between Lint output and messages list"));
 
+    // TODO: may be add text filter for error code?
+    for(int i=0; i<LintItem::LEVELS_COUNT; i++)
+    {
+        QAction *action = new QAction(m_menuFilter);
+        action->setCheckable(true);
+        action->setText(LintItem::levelString(static_cast<LintItem::LEVELS>(i)));
+        action->setChecked(true);
+        connect(action, &QAction::triggered, this, [this, action, i] {
+            setFilterLevel(static_cast<LintItem::LEVELS>(i), action->isChecked());
+        });
+        m_menuFilter->addAction(action);
+    }
+
     m_btnFilter->setIcon(QIcon(QLatin1String(Core::Constants::ICON_FILTER)));
     m_btnFilter->setToolTip(tr("Filter messages"));
     m_btnFilter->setPopupMode(QToolButton::InstantPopup);
     m_btnFilter->setMenu(m_menuFilter);
-    connect(m_menuFilter, SIGNAL(aboutToShow()), this, SLOT(updateFilterMenu()));
 
     connect(m_btnRun, SIGNAL(clicked()), SLOT(runLint()));
     connect(m_btnStop, SIGNAL(clicked()), SLOT(stopLint()));
@@ -264,30 +276,9 @@ void LintOutputPane::setMode(int index)
     m_processor->setMode(mode);
 }
 
-void LintOutputPane::updateFilterMenu()
+void LintOutputPane::setFilterLevel(LintItem::LEVELS level, bool isActive)
 {
-/*
-    d->m_categoriesMenu->clear();
-    const QList<Core::Id> filteredCategories = d->m_filter->filteredCategories();
-
-    QMap<QString, Core::Id> nameToIds;
-    foreach (Core::Id categoryId, d->m_model->categoryIds())
-        nameToIds.insert(d->m_model->categoryDisplayName(categoryId), categoryId);
-
-    const NameToIdsConstIt cend = nameToIds.constEnd();
-    for (NameToIdsConstIt it = nameToIds.constBegin(); it != cend; ++it) {
-        const QString &displayName = it.key();
-        const Core::Id categoryId = it.value();
-        QAction *action = new QAction(d->m_categoriesMenu);
-        action->setCheckable(true);
-        action->setText(displayName);
-        action->setChecked(!filteredCategories.contains(categoryId));
-        connect(action, &QAction::triggered, this, [this, action, categoryId] {
-            setCategoryVisibility(categoryId, action->isChecked());
-        });
-        d->m_categoriesMenu->addAction(action);
-    }
-*/
+    m_itemsModel->setFilterLevel(level, isActive);
 }
 
 QModelIndex LintOutputPane::selectedModelIndex()

@@ -29,7 +29,8 @@ public:
         ERROR,
         WARNING,
         INFO,
-        NOTE
+        NOTE,
+        LEVELS_COUNT
     };
 
     LintItem() : level(ERROR), text(), file(), line(-1), code(0) {}
@@ -46,7 +47,7 @@ public:
                 && (this->code==other.code) && (this->text == other.text) && (this->level == other.level);
     }
 
-    QString levelString(LEVELS level)
+    static QString levelString(LEVELS level)
     {
         QString res;
         switch (level)

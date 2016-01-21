@@ -154,7 +154,7 @@ void LintProcessor::process()
         connect(m_lint, SIGNAL(readyReadStandardOutput()), this, SLOT(readStdout()));
         connect(m_lint, SIGNAL(readyReadStandardError()), this, SLOT(readStderr()));
 
-        m_result.clear();
+        m_result.clear();        
         m_lint->start(lintExe, lintParams);
         if (m_lint->waitForStarted() && m_lint->waitForFinished(-1))
         {
@@ -332,16 +332,16 @@ bool LintProcessor::parse(const QByteArray &data)
             itm.text = lineRex.cap(6).trimmed();
             itm.text.chop(1);// remove last ')'
 #endif
-            if (level == QLatin1String("Warning"))
+            if (level == LintItem::levelString(LintItem::WARNING))
             {
                 itm.iconResource=QLatin1String(Core::Constants::ICON_WARNING);
                 itm.color=QColor(QLatin1String(Constants::COLOR_WARNING_BG));
                 itm.level=LintItem::WARNING;
-            } else if (level == QLatin1String("Info")) {
+            } else if (level == LintItem::levelString(LintItem::INFO)) {
                 itm.iconResource=QLatin1String(Core::Constants::ICON_INFO);
                 itm.color=QColor(QLatin1String(Constants::COLOR_INFO_BG));
                 itm.level=LintItem::INFO;
-            } else if (level == QLatin1String("Note")) {
+            } else if (level == LintItem::levelString(LintItem::NOTE)) {
                 itm.iconResource=QLatin1String(Core::Constants::ICON_INFO);
                 itm.color=QColor(QLatin1String(Constants::COLOR_NOTE_BG));
                 itm.level=LintItem::NOTE;

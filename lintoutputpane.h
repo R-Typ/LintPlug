@@ -14,6 +14,7 @@
 #define LINTOUTPUTPANE_H
 
 #include <coreplugin/ioutputpane.h>
+#include "lintitem.h"
 
 QT_BEGIN_NAMESPACE
 class QToolButton;
@@ -67,7 +68,7 @@ private slots:
     void switchView();
     void showResults();
     void setMode(int index);
-    void updateFilterMenu();
+    void setFilterLevel(LintItem::LEVELS level, bool isActive);
 
 private:
     QWidget*        m_mainWidget;

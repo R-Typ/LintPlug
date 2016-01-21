@@ -22,10 +22,11 @@ using namespace LintPlug::Internal;
 
 LintItemsModel::LintItemsModel(QObject *parent /*= 0*/) : QAbstractTableModel(parent)
 , m_itemsList(NULL)
+, m_levels()
 , m_currentSortColumn(Constants::OUTPUT_COLUMN_LEVEL)
 , m_currentSortOrder(Qt::AscendingOrder)
 {
-
+    for(int i=0; i<LintItem::LEVELS_COUNT; i++) m_levels.insert(static_cast<LintItem::LEVELS>(i));
 }
 
 LintItemsModel::~LintItemsModel()
@@ -46,7 +47,12 @@ int LintItemsModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid() || !m_itemsList)
         return 0;
 
-    return m_itemsList->count();
+    int cnt(0);
+    for(int i=0; i<m_itemsList->count(); i++)
+    {
+        if (m_levels.contains(m_itemsList->at(i).level)) cnt++;
+    }
+    return cnt;
 }
 
 int LintItemsModel::columnCount(const QModelIndex &parent) const
@@ -60,7 +66,15 @@ QVariant LintItemsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    LintItem item = m_itemsList->at(index.row());
+    LintItem item;
+    int idx(-1);
+    for(int i=0; i<m_itemsList->count(); i++)
+    {
+        item=m_itemsList->at(i);
+        if (m_levels.contains(item.level)) idx++;
+        if (idx == index.row()) break;
+    }
+    if (idx == -1) return QVariant();
 
     if (role == Qt::BackgroundColorRole)
         return item.color;
@@ -72,7 +86,7 @@ QVariant LintItemsModel::data(const QModelIndex &index, int role) const
         case Constants::OUTPUT_COLUMN_LEVEL:
             switch (role) {
                 case Qt::DisplayRole:
-                    return item.levelString(item.level);
+                    return LintItem::levelString(item.level);
                 case Qt::DecorationRole:
                     return QVariant::fromValue(QIcon(item.iconResource));
             }
@@ -152,5 +166,12 @@ void LintItemsModel::clear()
 {
     if (m_itemsList) m_itemsList->clear();
     sort(m_currentSortColumn, m_currentSortOrder);
+}
+
+void LintItemsModel::setFilterLevel(LintItem::LEVELS level, bool isActive)
+{
+    if (isActive) m_levels.insert(level);
+    else m_levels.remove(level);
+    emit layoutChanged();
 }
 

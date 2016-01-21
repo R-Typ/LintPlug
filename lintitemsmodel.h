@@ -36,9 +36,11 @@ public:
 
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void clear();
+    void setFilterLevel(LintItem::LEVELS level, bool isActive);
 
 private:
     QList<LintItem> *m_itemsList;
+    QSet<LintItem::LEVELS> m_levels;
     Constants::OutputColumnIndex m_currentSortColumn;
     Qt::SortOrder m_currentSortOrder;
 
